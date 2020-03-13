@@ -65,19 +65,6 @@ def oauth():
     return redirect("http://slack.com/oauth/authorize", code=302)
 
 
-# Bind the Events API route to your existing Flask app by passing the server
-# instance as the last param, or with `server=app`.
-
-# Create an event listener for "reaction_added" events and print the emoji name
-@slack_events_adapter.on("reaction_added")
-def reaction_added(event_data):
-  emoji = event_data["event"]["reaction"]
-  print(emoji)
-
-@slack_events_adapter.on("message.channel")
-def messageChat(event_data):
-    print("messagechannels")
-
 @slack_events_adapter.on("app_mention")
 def app_mentionA(event_data):
     print("app_mention",event_data,event_data['token'])
@@ -127,7 +114,9 @@ def handle_message(event_data):
         transferMessage(event_data)
           
 
-          
+@app.route('/pp')
+def route_pp():
+     return str(bot.send_private_msg(user_id=7277017, message='message'))       
           
 # Start the server on port 3000
 if __name__ == "__main__":
