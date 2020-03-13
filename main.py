@@ -10,7 +10,7 @@ import os,sys,threading
 app = Flask(__name__)
 import config
 import getQQGroupMemberList
-from  prepareInfo import *
+import  prepareInfo
 bot = CQHttp(config.api_root, config.access_token, config.secret)
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
@@ -76,7 +76,7 @@ def replaceUser(text):
           if bLast :
               end = a.find('>')
               if end >-1:
-                  a='@'+ global_userList[a[:end]]+a[end:]['name']
+                  a='@'+ prepareInfo.global_userList[a[:end]]+a[end:]['name']
           Msg =Msg +a
           bLast =  a[-1] =='<'
     except:
@@ -87,16 +87,16 @@ def replaceUser(text):
 
 def makeMsg(event_data):
     text = event_data['event']['text']
-    return  '#'+ global_channels_List[event_data['event']['channel']]+' '+ global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+    return  '#'+ prepareInfo.global_channels_List[event_data['event']['channel']]+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
 
 
 def transferMessage(event_data):  
     message=makeMsg(event_data)
-    if event_data['event']['channel'] not in needAlert_userList:
+    if event_data['event']['channel'] not in prepareInfo.needAlert_userList:
         bot.send_group_msg(group_id=config.group_id, message=message)
         return
     
-    for a in needAlert_userList[event_data['event']['channel']]:
+    for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:
         getQQGroupMemberList.sendPrivateMesage(config.api_root,a,message)
 
 
