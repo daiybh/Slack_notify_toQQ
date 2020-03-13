@@ -1,37 +1,42 @@
 <!doctype html>
 <title>Hello from Flask</title>
-{% if name %}
-  <h1>Hello {{ name }}!</h1>
-{% else %}
-  <h1>Hello World!</h1>
-{% endif %}
 
-<ul><h1>userlist</h1>
-{% for user in userlist%}
-<li>ID: {{ user}} ------- {{userlist[user]['name'] }}</li>
-{% endfor %}
-</ul>
 
-<br>
-<br>
-<ul><h1>global_channels_List</h1>
-{% for c in global_channels_List%}
-<li>ID: {{ c}} ------- {{global_channels_List[c]}}</li>
-{% if needAlert_userList[c] %}
+<div class="app">
+
+  <div style="display:inline-block;background:#f00;">
+
     <ul>
-    {% for qq in needAlert_userList[c]%}
-    <li> {{qq}}   -------
-        {% for user in global_QQ_UserID%}
-            {% if global_QQ_UserID[user] == qq  %}
-                {{ user}}
-            {%endif%}
-        {% endfor %}
-        
-    </li>
-    {% endfor %}
+      <h1>userlist</h1>
+      {% for user in userlist%}
+      <li>ID: {{ user}} ------- {{userlist[user]['name'] }}</li>
+      {% endfor %}
     </ul>
-{%endif%}
-{% endfor %}
-</ul>
 
 
+
+  </div>
+
+  <div style="display:inline-block;background:#0f0;margin-left:10px;">
+    <ul>
+      <h1>global_channels_List</h1>
+      {% for c in global_channels_List -%}
+      <li>ID: {{ c}} ------- {{global_channels_List[c]}}</li>
+      {% if needAlert_userList[c] %}
+      <ul>
+        {% for qq in needAlert_userList[c] %}
+        <li> {{qq}} -------
+          {% for user in global_QQ_UserID%}
+          {% if global_QQ_UserID[user] == qq  %}
+          {{ user}}
+          {%endif%}
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+      {%endif%}
+      {%- endfor %}
+    </ul>
+
+  </div>
+</div>

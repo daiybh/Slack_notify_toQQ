@@ -10,9 +10,11 @@ import os,sys,threading
 
 import config
 import  prepareInfo
+import asyncio
 
+app = Flask(__name__,static_url_path='')
 
-bot = CQHttp(config.api_root, config.access_token, config.secret)
+bot = CQHttp(config.api_root, config.access_token, config.secret,server=app)
 
 def get_group_member_list():    
     a = bot.get_group_member_list(group_id=config.group_id)
@@ -23,7 +25,6 @@ def get_group_member_list():
 get_group_member_list()
 
 
-app = bot.server_app
 
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/slack/events", app)
@@ -36,7 +37,7 @@ lock=threading.Lock()
 @app.route('/')
 def aaaa():
   print(app.url_map)
-  return str(app.url_map)
+  #return str(app.url_map)
   return render_template('index.html')
 
   
@@ -130,7 +131,7 @@ def handle_message(event_data):
           
 # Start the server on port 3000
 if __name__ == "__main__":
-  prepareInfo.autoload()
+  #prepareInfo.autoload()
   if len(sys.argv)>1:
     app.run(port=3443,ssl_context='adhoc')
   else:
