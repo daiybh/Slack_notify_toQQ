@@ -116,6 +116,7 @@ def handle_message(event_data):
           
 # Start the server on port 3000
 if __name__ == "__main__":
+  prepareInfo.autoload()
   if len(sys.argv)>1:
     app.run(port=3443,ssl_context='adhoc')
   else:
