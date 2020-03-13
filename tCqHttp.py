@@ -1,10 +1,11 @@
 from cqhttp import CQHttp
 import config,os
+from flask import Flask,redirect,render_template
 
 from slackeventsapi import SlackEventAdapter
 
-
-bot = CQHttp(config.api_root, config.access_token, config.secret)
+app = Flask("llll")
+bot = CQHttp(config.api_root, config.access_token, config.secret,server=app)
 
 app = bot.server_app
 @bot.on_message
