@@ -9,31 +9,14 @@ import os,sys,threading
 # This `app` represents your existing Flask app
 app = Flask(__name__)
 import config
-
+import getQQGroupMemberList
+from  prepareInfo import *
 bot = CQHttp(config.api_root, config.access_token, config.secret)
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-global_userList={}
-global_channels_List={}
 
 lastEventTS=0.0
 lock=threading.Lock()
-
-def getUserList():
-  response = slack_web_client.users_list()
-  if response['ok'] :
-    for a in response['members']:
-      print(a['id'],a['name'])
-      global_userList[a['id']] = a['name']
-
-
-def getChannels_list():
-    response = slack_web_client.channels_list()
-    for a in response['channels']:
-        global_channels_List[a['id']] = a['name']
-        
-
-getUserList()
-getChannels_list()
+autoload()
 
 # An example of one of your Flask app's routes
 @app.route("/")
@@ -90,7 +73,17 @@ def replaceUser(text):
 
 def makeMsg(event_data):
     text = event_data['event']['text']
-    return  '#'+ global_channels_List[event_data['event']['channel']]+' '+ global_userList[event_data['event']['user']]+" say: "+replaceUser(text)
+    return  '#'+ global_channels_List[event_data['event']['channel']]+' '+ global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+
+
+def transferMessage(event_data):  
+    message=makeMsg(event_data)
+    if event_data['event']['channel'] not in needAlert_userList:
+        bot.send_group_msg(group_id=config.group_id, message=message)
+        return
+    
+    for a in needAlert_userList[event_data['event']['channel']]:
+        getQQGroupMemberList.sendPrivateMesage(config.api_root,a,message)
 
 
 @slack_events_adapter.on("message")
@@ -100,7 +93,11 @@ def handle_message(event_data):
     with lock:
        if lastEventTS < event_data['event_time']:
           lastEventTS = event_data['event_time']
-          bot.send_group_msg(group_id=config.group_id, message=makeMsg(event_data))
+          transferMessage(event_data)
+          
+
+          
+          
 # Start the server on port 3000
 if __name__ == "__main__":
   if len(sys.argv)>1:
