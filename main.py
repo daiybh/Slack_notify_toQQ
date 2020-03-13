@@ -64,7 +64,7 @@ def replaceUser(text):
         if bLast :
             end = a.find('>')
             if end >-1:
-                a='@'+ global_userList[a[:end]]+a[end:]
+                a='@'+ global_userList[a[:end]]+a[end:]['name']
         Msg =Msg +a
         bLast =  a[-1] =='<'
     if Msg=='':
