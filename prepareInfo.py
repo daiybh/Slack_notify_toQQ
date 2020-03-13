@@ -49,12 +49,11 @@ def getChannels_list():
 def autoload():
     try:
         global global_QQ_UserID
-        global_QQ_UserID=getQQGroupMemberList.get_group_member_list(config.api_root,config.group_id)
-
-        getUserList()
-        getChannels_list()
+        if len(global_QQ_UserID) ==0:
+            global_QQ_UserID=getQQGroupMemberList.get_group_member_list(config.api_root,config.group_id)
+        if len(global_userList)==0:
+            getUserList()
+        if len(global_channels_List)==0:
+            getChannels_list()
     except:
         pass
-
-    for a in needAlert_userList:
-        print(a)

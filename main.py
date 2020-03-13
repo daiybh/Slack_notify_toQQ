@@ -1,6 +1,6 @@
 #Using your existing Flask instance:
 
-from flask import Flask,redirect
+from flask import Flask,redirect,render_template
 from slackeventsapi import SlackEventAdapter
 from cqhttp import CQHttp
 from slack import WebClient
@@ -16,19 +16,30 @@ slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 lastEventTS=0.0
 lock=threading.Lock()
-autoload()
 
-# An example of one of your Flask app's routes
-@app.route("/")
-def hello():
-  xhtml=str(lastEventTS)+"\n"
-  for a in global_channels_List:
-      xhtml=xhtml+"<li>"+a+"   "+global_channels_List[a]+"</li>"
-  xhtml=xhtml+"<br>"
-  for a in global_userList:
-      xhtml=xhtml+"<li>"+a+"   "+global_userList[a]+"</li>"
 
-  return "Hello there!\n"+xhtml
+@app.route('/a')
+def aaaa():
+  return render_template('hh.html')
+
+  
+@app.route('/')
+def index():    
+    prepareInfo.autoload()   
+    
+    print(prepareInfo.global_userList)
+    print(prepareInfo.global_channels_List)
+    print(prepareInfo.global_QQ_UserID)
+    print(prepareInfo.needAlert_userList)
+    
+    return render_template('index.html'
+    ,lastEventTS=lastEventTS
+    ,userlist=prepareInfo.global_userList 
+    ,global_channels_List=prepareInfo.global_channels_List
+    ,global_QQ_UserID=prepareInfo.global_QQ_UserID
+    ,needAlert_userList=prepareInfo.needAlert_userList)
+
+
 
 
 @app.route("/oauth")
@@ -60,13 +71,16 @@ def replaceUser(text):
 
     bLast=False
     Msg=''
-    for a in text.split('@'):
-        if bLast :
-            end = a.find('>')
-            if end >-1:
-                a='@'+ global_userList[a[:end]]+a[end:]['name']
-        Msg =Msg +a
-        bLast =  a[-1] =='<'
+    try:
+      for a in text.split('@'):
+          if bLast :
+              end = a.find('>')
+              if end >-1:
+                  a='@'+ global_userList[a[:end]]+a[end:]['name']
+          Msg =Msg +a
+          bLast =  a[-1] =='<'
+    except:
+      return text
     if Msg=='':
       return text
     return Msg
@@ -90,10 +104,12 @@ def transferMessage(event_data):
 def handle_message(event_data):
     print(event_data)
     global lastEventTS,lock
-    with lock:
-       if lastEventTS < event_data['event_time']:
-          lastEventTS = event_data['event_time']
-          transferMessage(event_data)
+    with lock:    
+      
+      prepareInfo.autoload()
+      if lastEventTS < event_data['event_time']:
+        lastEventTS = event_data['event_time']
+        transferMessage(event_data)
           
 
           
