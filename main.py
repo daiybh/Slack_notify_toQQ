@@ -33,6 +33,11 @@ slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/s
 lastEventTS=0.0
 lock=threading.Lock()
 
+@bot.on_message
+def handle_msg(event):
+    bot.send(event, '你好呀，下面一条是你刚刚发的：')
+    return {'reply': event['message'], 'at_sender': False}
+
 
 @app.route('/')
 def aaaa():
