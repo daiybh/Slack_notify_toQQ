@@ -36,7 +36,8 @@ lock=threading.Lock()
 @bot.on_message
 def handle_msg(event):
     bot.send(event, 'not supported')
-    return {'reply': event['message'], 'at_sender': False}
+    slack_web_client.chat_postMessage(channel='CV8PBFSKE',text=str(event['message']))
+    #return {'reply': event['message'], 'at_sender': False}
 
 
 @app.route('/')
