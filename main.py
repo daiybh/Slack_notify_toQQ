@@ -35,7 +35,7 @@ lock=threading.Lock()
 
 @bot.on_message
 def handle_msg(event):
-    bot.send(event, '你好呀，下面一条是你刚刚发的：')
+    bot.send(event, 'not supported')
     return {'reply': event['message'], 'at_sender': False}
 
 
