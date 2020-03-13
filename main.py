@@ -7,23 +7,40 @@ from slack import WebClient
 import json
 import os,sys,threading
 # This `app` represents your existing Flask app
-app = Flask(__name__)
+
 import config
-import getQQGroupMemberList
 import  prepareInfo
+
+
 bot = CQHttp(config.api_root, config.access_token, config.secret)
+
+def get_group_member_list():    
+    a = bot.get_group_member_list(group_id=config.group_id)
+    for b in a:
+        prepareInfo.global_QQ_UserID[b['card']] =b['user_id']
+    
+
+get_group_member_list()
+
+
+app = bot.server_app
+
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/slack/events", app)
+
 
 lastEventTS=0.0
 lock=threading.Lock()
 
 
-@app.route('/a')
+@app.route('/')
 def aaaa():
-  return render_template('hh.html')
+  print(app.url_map)
+  return str(app.url_map)
+  return render_template('index.html')
 
   
-@app.route('/')
+@app.route('/a')
 def index():    
     prepareInfo.autoload()   
     
@@ -49,8 +66,6 @@ def oauth():
 
 # Bind the Events API route to your existing Flask app by passing the server
 # instance as the last param, or with `server=app`.
-slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/slack/events", app)
-
 
 # Create an event listener for "reaction_added" events and print the emoji name
 @slack_events_adapter.on("reaction_added")
@@ -68,7 +83,6 @@ def app_mentionA(event_data):
     bot.send_group_msg(group_id=config.group_id, message='slack mention you msg')
 
 def replaceUser(text):
-
     bLast=False
     Msg=''
     try:
@@ -96,8 +110,8 @@ def transferMessage(event_data):
         bot.send_group_msg(group_id=config.group_id, message=message)
         return
     
-    for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:
-        getQQGroupMemberList.sendPrivateMesage(config.api_root,a,message)
+    for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:        
+        bot.send_private_msg(user_id=a, message=message)
 
 
 @slack_events_adapter.on("message")

@@ -3,7 +3,6 @@ import config
 import os
 
 from slack import WebClient
-import getQQGroupMemberList
 
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
@@ -48,9 +47,6 @@ def getChannels_list():
 
 def autoload():
     try:
-        global global_QQ_UserID
-        if len(global_QQ_UserID) ==0:
-            global_QQ_UserID=getQQGroupMemberList.get_group_member_list(config.api_root,config.group_id)
         if len(global_userList)==0:
             getUserList()
         if len(global_channels_List)==0:
