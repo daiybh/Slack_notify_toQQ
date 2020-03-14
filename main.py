@@ -13,6 +13,8 @@ from  prepareInfo import CPrePareInfo
 import asyncio
 
 
+lastRecvedChannels={}
+
 app = Flask(__name__,static_url_path='')
 
 bot = CQHttp(config.api_root, config.access_token, config.secret,server=app)
@@ -32,9 +34,10 @@ lock=threading.Lock()
 @bot.on_message
 def handle_msg(event):
     #bot.send(event, 'not supported')
-    print("bot.on_message  handlemsg-->",event['message'] ,event)
-    #slack_web_client.chat_postMessage(channel='CV8PBFSKE',text=str(event['message']))
-    return {'reply': event['message'], 'at_sender': False}
+    print("bot.on_message  handlemsg-->",event['message'] ,event['user_id'],lastRecvedChannels[event['user_id']])
+    if event['user_id'] in lastRecvedChannels:
+      slack_web_client.chat_postMessage(channel=lastRecvedChannels[event['user_id']],text=prepareInfo.findName_byQQId(event['user_id']) +"   say: "+str(event['message']))
+    return '' #{'reply': event['message'], 'at_sender': False}
 
 
 @app.route('/')
@@ -98,8 +101,12 @@ def replaceUser(text):
 
 def makeMsg(event_data):
     text = event_data['event']['text']
-    return  '#'+ prepareInfo.global_channels_List[event_data['event']['channel']]+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
-
+    try:
+      if event_data['event']['channel'] not in prepareInfo.global_channels_List:
+        prepareInfo.getchannels_info(event_data['event']['channel'])
+      return  '#'+ prepareInfo.global_channels_List[event_data['event']['channel']]+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+    except:
+      return text
 
 def transferMessage(event_data):  
     message=makeMsg(event_data)
@@ -109,15 +116,14 @@ def transferMessage(event_data):
     
     for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:        
         bot.send_private_msg(user_id=a, message=message)
+        lastRecvedChannels[a] = event_data['event']['channel']
 
 
 @slack_events_adapter.on("message")
 def handle_message(event_data):
     print(event_data)
     global lastEventTS,lock
-    with lock:    
-      
-      prepareInfo.autoload()
+    with lock:      
       if lastEventTS < event_data['event_time']:
         lastEventTS = event_data['event_time']
         transferMessage(event_data)

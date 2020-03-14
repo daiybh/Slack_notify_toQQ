@@ -21,12 +21,14 @@ class CPrePareInfo:
          self.global_userList={}
          self.global_channels_List={}
          self.global_QQ_UserID={}
+         self.global_QQID_displayName={}
          self.__needAlert_userList={}#{'needAlertChannelID':{'member':['wang','x','b']},'needAlertChannelID':{'member':['wang','x','b']}}
 
-    def getQQID(self,name):
-        dict={'name':name}
+    def getQQID(self,name,display_name):
+        dict={'name':name,'display_name':display_name}
         try:
             dict['QQ'] = self.global_QQ_UserID[name]
+            self.global_QQID_displayName[dict['QQ']] = display_name
         except:
             pass
         return dict
@@ -34,11 +36,11 @@ class CPrePareInfo:
     @log
     def getUserList(self):        
         response = self.slack_web_client.users_list()
-        #print(response)
+        print(response)
         if response['ok'] :
             for a in response['members']:
             #print(a['id'],a['name'])      
-                self.global_userList[a['id']] = self.getQQID(a['name'])
+                self.global_userList[a['id']] = self.getQQID(a['name'],a['profile']['display_name'])
 
     @property
     def needAlert_userList(self):
@@ -72,11 +74,15 @@ class CPrePareInfo:
         for b in a:
             self.global_QQ_UserID[b['card']] =b['user_id']
     
+    def findName_byQQId(self,QQId):
+        if QQId in self.global_QQID_displayName:
+            return self.global_QQID_displayName[QQId]
+        return 'None'
 
 
 
     @log
-    def autoload(self):
+    def autoloadaaa(self):
         try:
             if len(self.global_userList)==0:
                 self.getUserList()
