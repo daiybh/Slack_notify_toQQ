@@ -43,11 +43,15 @@ class CPrePareInfo:
     @property
     def needAlert_userList(self):
         return self.__needAlert_userList
-
+    
     @log
     def getchannels_info(self,channelID):
         a = self.slack_web_client.channels_info(channel=channelID)    
+        
+        if a['ok'] ==False:
+            return
         needlist=[]
+        self.global_channels_List[a['channel']['id']] = a['channel']['name']
         for userId in a['channel']['members']:
             if 'QQ' in self.global_userList[userId]:
                 needlist.append(self.global_userList[userId]['QQ'])            
