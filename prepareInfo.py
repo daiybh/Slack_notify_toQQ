@@ -1,55 +1,82 @@
 import config
 
-import os
+import os,time
 
 from slack import WebClient
 
-slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+def log(func):
+    def wrapper(*args, **kw):
+        start = time.time()
+        run_func= func(*args, **kw)
+        end = time.time()
+        print('%s executed in %s ms' % (func.__name__, (end - start) * 1000))
+        return run_func
+    return wrapper
 
-global_userList={}
-global_channels_List={}
-global_QQ_UserID={}
-needAlert_userList={}#{'needAlertChannelID':{'member':['wang','x','b']},'needAlertChannelID':{'member':['wang','x','b']}}
+class CPrePareInfo:
+    def __init__(self,slack_web_client,QQBot):
+         self.slack_web_client = slack_web_client
+         self.QQBot = QQBot
+         
+         self.global_userList={}
+         self.global_channels_List={}
+         self.global_QQ_UserID={}
+         self.__needAlert_userList={}#{'needAlertChannelID':{'member':['wang','x','b']},'needAlertChannelID':{'member':['wang','x','b']}}
+
+    def getQQID(self,name):
+        dict={'name':name}
+        try:
+            dict['QQ'] = self.global_QQ_UserID[name]
+        except:
+            pass
+        return dict
+    
+    @log
+    def getUserList(self):        
+        response = self.slack_web_client.users_list()
+        #print(response)
+        if response['ok'] :
+            for a in response['members']:
+            #print(a['id'],a['name'])      
+                self.global_userList[a['id']] = self.getQQID(a['name'])
+
+    @property
+    def needAlert_userList(self):
+        return self.__needAlert_userList
+
+    @log
+    def getchannels_info(self,channelID):
+        a = self.slack_web_client.channels_info(channel=channelID)    
+        needlist=[]
+        for userId in a['channel']['members']:
+            if 'QQ' in self.global_userList[userId]:
+                needlist.append(self.global_userList[userId]['QQ'])            
+        if len(needlist)>0:
+            self.__needAlert_userList[channelID]=needlist
+
+    @log
+    def getChannels_list(self):
+        response = self.slack_web_client.channels_list()
+        #print(response)
+        for a in response['channels']:
+            self.global_channels_List[a['id']] = a['name']
+            self.getchannels_info(a['id'])
+
+    @log
+    def get_group_member_list(self):    
+        a = self.QQBot.get_group_member_list(group_id=config.group_id)
+        for b in a:
+            self.global_QQ_UserID[b['card']] =b['user_id']
+    
 
 
-def getQQID(name):
-    dict={'name':name}
-    try:
-        dict['QQ'] = global_QQ_UserID[name]
-    except:
-        pass
-    return dict
-def getUserList():
-  response = slack_web_client.users_list()
-  #print(response)
-  if response['ok'] :
-    for a in response['members']:
-      #print(a['id'],a['name'])      
-      global_userList[a['id']] = getQQID(a['name'])
 
-
-
-def getchannels_info(channelID):
-    a = slack_web_client.channels_info(channel=channelID)    
-    needlist=[]
-    for userId in a['channel']['members']:
-        if 'QQ' in global_userList[userId]:
-            needlist.append(global_userList[userId]['QQ'])            
-    if len(needlist)>0:
-        needAlert_userList[channelID]=needlist
-
-def getChannels_list():
-    response = slack_web_client.channels_list()
-    #print(response)
-    for a in response['channels']:
-        global_channels_List[a['id']] = a['name']
-        getchannels_info(a['id'])
-
-def autoload():
-    try:
-        if len(global_userList)==0:
-            getUserList()
-        if len(global_channels_List)==0:
-            getChannels_list()
-    except:
-        pass
+    @log
+    def autoload(self):
+        try:
+            if len(self.global_userList)==0:
+                self.getUserList()
+            if len(self.global_channels_List)==0:
+                self.getChannels_list()
+        except:
+            pass

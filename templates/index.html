@@ -1,15 +1,24 @@
 <!doctype html>
 <title>Hello from Flask</title>
+{% if cc %}
+<pre>{{cc}}</pre>
+{%endif%}
+{{time}} {{name}}
 
+<div class="app" width='100%'>
 
-<div class="app">
-
-  <div style="display:inline-block;background:#f00;">
+  <div style="display:inline-block;background:rgb(250, 19, 50);">
 
     <ul>
       <h1>userlist</h1>
       {% for user in userlist%}
-      <li>ID: {{ user}} ------- {{userlist[user]['name'] }}</li>
+      <li>ID: {{ user}}  
+        <ul>
+          {% for x in userlist[user] %}
+           <li> {{x}}: {{userlist[user][x] }}</li>
+          {%endfor%}
+        </ul>
+      </li>
       {% endfor %}
     </ul>
 
@@ -17,7 +26,7 @@
 
   </div>
 
-  <div style="display:inline-block;background:#0f0;margin-left:10px;">
+  <div style="display:inline-block;background:#0f0;margin-left:50px;">
     <ul>
       <h1>global_channels_List</h1>
       {% for c in global_channels_List -%}

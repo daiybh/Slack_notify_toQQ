@@ -1,33 +1,29 @@
 #Using your existing Flask instance:
 
-from flask import Flask,redirect,render_template
+from flask import Flask,redirect,render_template,request
 from slackeventsapi import SlackEventAdapter
 from cqhttp import CQHttp
 from slack import WebClient
-import json
+import json,datetime
 import os,sys,threading
 # This `app` represents your existing Flask app
 
 import config
-import  prepareInfo
+from  prepareInfo import CPrePareInfo
 import asyncio
+
 
 app = Flask(__name__,static_url_path='')
 
 bot = CQHttp(config.api_root, config.access_token, config.secret,server=app)
-
-def get_group_member_list():    
-    a = bot.get_group_member_list(group_id=config.group_id)
-    for b in a:
-        prepareInfo.global_QQ_UserID[b['card']] =b['user_id']
-    
-
-get_group_member_list()
-
-
-
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/slack/events", app)
+
+
+prepareInfo =CPrePareInfo(slack_web_client,bot)
+
+prepareInfo.get_group_member_list()
+prepareInfo.getUserList()
 
 
 lastEventTS=0.0
@@ -43,26 +39,27 @@ def handle_msg(event):
 
 @app.route('/')
 def aaaa():
-  print(app.url_map)
-  #return str(app.url_map)
-  return render_template('index.html')
+  return render_template('index.html',cc=str(app.url_map),time=datetime.datetime.now())
 
-  
+#CV8PBFSKE
+@app.route('/a/<name>')  
 @app.route('/a')
-def index():    
-    prepareInfo.autoload()   
+def index(name=''):    
+    #prepareInfo.autoload()   
     
-    print(prepareInfo.global_userList)
-    print(prepareInfo.global_channels_List)
-    print(prepareInfo.global_QQ_UserID)
-    print(prepareInfo.needAlert_userList)
+    #print(prepareInfo.global_userList)
+    #print(prepareInfo.global_channels_List)
+    #print(prepareInfo.global_QQ_UserID)
+    #print(prepareInfo.needAlert_userList)
     
     return render_template('index.html'
     ,lastEventTS=lastEventTS
     ,userlist=prepareInfo.global_userList 
     ,global_channels_List=prepareInfo.global_channels_List
     ,global_QQ_UserID=prepareInfo.global_QQ_UserID
-    ,needAlert_userList=prepareInfo.needAlert_userList)
+    ,needAlert_userList=prepareInfo.needAlert_userList
+    ,time=datetime.datetime.now()
+    ,name=name)
 
 
 
