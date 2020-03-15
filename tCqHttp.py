@@ -1,7 +1,7 @@
 from cqhttp import CQHttp
 import config,os
 from flask import Flask,redirect,render_template
-
+import requests
 from slackeventsapi import SlackEventAdapter
 
 app = Flask("llll")
@@ -9,6 +9,7 @@ bot = CQHttp(config.api_root, config.access_token, config.secret,server=app)
 
 app = bot.server_app
 @bot.on_message
+
 def handle_msg(event):
     bot.send(event, '你好呀，下面一条是你刚刚发的：')
     return {'reply': event['message'], 'at_sender': False}
@@ -26,7 +27,7 @@ def handle_request(event):
 @app.route("/")
 def oauth():
     
-    bot.send_private_msg(user_id=7277017, message='hello')
+    #bot.send_private_msg(user_id=7277017, message='hello')
     return 'hhhhh'
 
 slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/slack/events", bot.server_app)

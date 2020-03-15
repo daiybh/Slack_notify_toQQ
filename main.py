@@ -6,6 +6,7 @@ from cqhttp import CQHttp
 from slack import WebClient
 import json,datetime
 import os,sys,threading
+import requests
 # This `app` represents your existing Flask app
 
 import config
@@ -42,13 +43,15 @@ def handle_msg(event):
 
 @app.route('/')
 def aaaa():
-  return render_template('index.html',cc=str(app.url_map),time=datetime.datetime.now())
+  ip = requests.get('http://myip.ipip.net/')
+  return render_template('index.html',cc=str(app.url_map),time=datetime.datetime.now(),ip=ip.text)
 
 #CV8PBFSKE
 @app.route('/a/<name>')  
 @app.route('/a')
 def index(name=''):    
     #prepareInfo.autoload()   
+    ip = requests.get('http://myip.ipip.net/')
     
     #print(prepareInfo.global_userList)
     #print(prepareInfo.global_channels_List)
@@ -67,7 +70,8 @@ def index(name=''):
     ,global_QQ_UserID=prepareInfo.global_QQ_UserID
     ,needAlert_userList=prepareInfo.needAlert_userList
     ,time=datetime.datetime.now()
-    ,name=name)
+    ,name=name
+    ,ip=ip.text)
 
 
 
