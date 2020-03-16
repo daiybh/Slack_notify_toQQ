@@ -32,4 +32,5 @@ def oauth():
 
 slack_events_adapter = SlackEventAdapter(os.environ["SLACK_SIGNING_SECRET"], "/slack/events", bot.server_app)
 
+
 app.run(host='127.0.0.1', port=8080)
