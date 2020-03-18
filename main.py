@@ -1,6 +1,6 @@
 #Using your existing Flask instance:
 
-from flask import Flask,redirect,render_template,request
+from flask import Flask,redirect,render_template,request,Response,make_response
 from slackeventsapi import SlackEventAdapter
 from cqhttp import CQHttp
 from slack import WebClient
@@ -15,6 +15,10 @@ import asyncio
 
 
 lastRecvedChannels={}
+
+SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
+SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
+
 
 app = Flask(__name__,static_url_path='')
 
@@ -81,6 +85,73 @@ def oauth():
     return redirect("http://slack.com/oauth/authorize", code=302)
 
 
+# Helper for verifying that requests came from Slack
+def verify_slack_token(request_token):
+    if SLACK_VERIFICATION_TOKEN != request_token:
+        print("Error: invalid verification token!")
+        print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
+        return make_response("Request contains invalid Slack verification token", 403)
+
+
+
+# The endpoint Slack will load your menu options from
+@app.route("/slack/message_options", methods=["POST"])
+def message_options():
+    # Parse the request payload
+    print("message_options post")
+    form_json = json.loads(request.form["payload"])
+
+    # Verify that the request came from Slack
+    verify_slack_token(form_json["token"])
+
+    # Dictionary of menu options which will be sent as JSON
+    menu_options = {
+        "options": [
+            {
+                "text": "Cappuccino",
+                "value": "cappuccino"
+            },
+            {
+                "text": "Latte",
+                "value": "latte"
+            }
+        ]
+    }
+
+    # Load options dict as JSON and respond to Slack
+    return Response(json.dumps(menu_options), mimetype='application/json')
+
+
+# The endpoint Slack will send the user's menu selection to
+@app.route("/slack/message_actions", methods=["POST"])
+def message_actions():
+
+    # Parse the request payload
+    form_json = json.loads(request.form["payload"])
+
+    # Verify that the request came from Slack
+    verify_slack_token(form_json["token"])
+
+    # Check to see what the user's selection was and update the message accordingly
+    selection = form_json["actions"][0]["selected_options"][0]["value"]
+
+    if selection == "cappuccino":
+        message_text = "cappuccino"
+    else:
+        message_text = "latte"
+
+    response = slack_web_client.chat_update(
+      channel=form_json["channel"]["id"],
+      ts=form_json["message_ts"],
+      text="One {}, right coming up! :coffee:".format(message_text),
+      attachments=[] # empty `attachments` to clear the existing massage attachments
+    )
+
+    # Send an HTTP 200 response with empty body so Slack knows we're done here
+    return make_response("", 200)
+
+
+
 @slack_events_adapter.on("app_mention")
 def app_mentionA(event_data):
     print("app_mention",event_data,event_data['token'])
@@ -94,7 +165,8 @@ def replaceUser(text):
           if bLast :
               end = a.find('>')
               if end >-1:
-                  a='@'+ prepareInfo.global_userList[a[:end]]+a[end:]['name']
+                print('aaaa->',a[:end],"------",a[end:])
+                a='@'+ prepareInfo.global_userList[a[:end]]['name']+a[end:]
           Msg =Msg +a
           bLast =  a[-1] =='<'
     except:
