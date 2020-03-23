@@ -44,12 +44,14 @@ def handle_msg(event):
     if msg[0]=='#':
       sa = msg[0].find(' ')
       if sa>1:
-        channel= msg[0:sa]
-        msg = msg[sa:]
-    elif event['user_id'] in lastRecvedChannels:
-      channel=lastRecvedChannels[event['user_id']]
-    else:
-      return ' '
+        channel= prepareInfo.getchannelID_byName(msg[1:sa])
+        if channel!="":
+          msg = msg[sa:]
+    if channel=='' :
+      if event['user_id'] in lastRecvedChannels:
+        channel=lastRecvedChannels[event['user_id']]      
+      else:
+        return ' '
 
     slack_web_client.chat_postMessage(channel=channel,text=prepareInfo.findName_byQQId(event['user_id']) +"   say: "+str(msg))
     

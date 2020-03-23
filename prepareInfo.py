@@ -46,6 +46,11 @@ class CPrePareInfo:
     def needAlert_userList(self):
         return self.__needAlert_userList
     
+    def getchannelID_byName(self,name):
+        for a in self.global_channels_List:
+            if self.global_channels_List[a] == name:
+                return a
+        return ''
     @log
     def getchannels_info(self,channelID):
         a = self.slack_web_client.channels_info(channel=channelID)    
