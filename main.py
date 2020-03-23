@@ -41,12 +41,17 @@ def handle_msg(event):
     #bot.send(event, 'not supported')
     channel=''
     msg = event['message']
+   # print('msg',msg,'----->',msg[0])
     if msg[0]=='#':
-      sa = msg[0].find(' ')
+    #  print("msg######")
+      sa = msg.find(' ')
+     # print(sa)
       if sa>1:
         channel= prepareInfo.getchannelID_byName(msg[1:sa])
+      #  print('channle',msg[1:sa],channel)
         if channel!="":
           msg = msg[sa:]
+   # print('channel2',channel)
     if channel=='' :
       if event['user_id'] in lastRecvedChannels:
         channel=lastRecvedChannels[event['user_id']]      
