@@ -53,8 +53,9 @@ class CPrePareInfo:
         return ''
     @log
     def getchannels_info(self,channelID):
-        a = self.slack_web_client.channels_info(channel=channelID)    
-        
+       # a = self.slack_web_client.channels_info(channel=channelID)    
+        a= self.slack_web_client.conversations_info(channel=channelID)
+        #self.slack_web_client.conversations_members(channel=channelID)
         if a['ok'] ==False:
             return
         needlist=[]
@@ -67,11 +68,20 @@ class CPrePareInfo:
 
     @log
     def getChannels_list(self):
+        responsePrivate=self.slack_web_client.conversations_list(types='public_channel,private_channel')
+        print(responsePrivate)
+        for a in responsePrivate['channels']:
+            self.global_channels_List[a['id']] = a['name']
+            self.getchannels_info(a['id'])
+
         response = self.slack_web_client.channels_list()
         #print(response)
         for a in response['channels']:
             self.global_channels_List[a['id']] = a['name']
             self.getchannels_info(a['id'])
+        #return
+        
+        
 
     @log
     def get_group_member_list(self):    
@@ -93,5 +103,18 @@ class CPrePareInfo:
                 self.getUserList()
             if len(self.global_channels_List)==0:
                 self.getChannels_list()
-        except:
+        except  Exception as inst:
+            print(inst)
             pass
+
+
+
+if __name__ == "__main__":
+    slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+    prepareInfo =CPrePareInfo(slack_web_client,None)
+    prepareInfo.autoloadaaa()
+    try:
+        prepareInfo.getchannels_info('CUV4HHNSH')
+    except  Exception as inst:
+        print(inst)
+    

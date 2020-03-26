@@ -12,7 +12,23 @@ import requests
 import config
 from  prepareInfo import CPrePareInfo
 import asyncio
+import logging
+import logging.handlers
 
+logger = logging.getLogger("slackQQ")
+logger .setLevel(logging.INFO)
+rf_handler = logging.handlers.TimedRotatingFileHandler(filename="all.log",when='D',interval=1)
+rf_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] - %(message)s"))
+
+#在控制台打印日志
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+
+logger.addHandler(rf_handler)
+logger.addHandler(handler)
+
+#logging.basicConfig(filename='mylog.log',level=logging.INFO)
 
 lastRecvedChannels={}
 
@@ -194,7 +210,6 @@ def replaceUser(text):
     if Msg=='':
       return text
     return Msg
-
 def makeMsg(event_data):
     text = event_data['event']['text']
     try:
@@ -206,6 +221,8 @@ def makeMsg(event_data):
 
 def transferMessage(event_data):  
     message=makeMsg(event_data)
+    print(message,event_data['event']['channel'])
+    return
     if event_data['event']['channel'] not in prepareInfo.needAlert_userList:
         bot.send_group_msg(group_id=config.group_id, message=message)
         return
@@ -216,8 +233,8 @@ def transferMessage(event_data):
 
 
 @slack_events_adapter.on("message")
-def handle_message(event_data):
-    print(event_data)
+def handle_message(event_data):    
+    logger.info("slack_events_adapter---->{0}".format(event_data))
     global lastEventTS,lock
     with lock:      
       if lastEventTS < event_data['event_time']:
@@ -228,10 +245,12 @@ def handle_message(event_data):
 @app.route('/pp')
 def route_pp():
      return str(bot.send_private_msg(user_id=7277017, message='message'))       
-          
+
+import time   
 # Start the server on port 3000
 if __name__ == "__main__":
   #prepareInfo.autoload()
+  logger.info("########################start########################")
   if len(sys.argv)>1:
     app.run(port=3443,ssl_context='adhoc')
   else:
