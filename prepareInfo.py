@@ -51,20 +51,32 @@ class CPrePareInfo:
             if self.global_channels_List[a] == name:
                 return a
         return ''
+
     @log
-    def getchannels_info(self,channelID):
-       # a = self.slack_web_client.channels_info(channel=channelID)    
+    def getchannelName(self,channelID):
         a= self.slack_web_client.conversations_info(channel=channelID)
-        #self.slack_web_client.conversations_members(channel=channelID)
+        if a['ok']==False:
+            return
+        print(a)
+        self.global_channels_List[a['channel']['id']] = a['channel']['name']
+        
+    @log
+    def getchannelMembers(self,channelID):
+        a = self.slack_web_client.conversations_members(channel=channelID)
         if a['ok'] ==False:
             return
+        print(a)
         needlist=[]
-        self.global_channels_List[a['channel']['id']] = a['channel']['name']
-        for userId in a['channel']['members']:
+        for userId in a['members']:
             if 'QQ' in self.global_userList[userId]:
                 needlist.append(self.global_userList[userId]['QQ'])            
         if len(needlist)>0:
             self.__needAlert_userList[channelID]=needlist
+
+    @log
+    def getchannels_info(self,channelID):
+        self.getchannelName(channelID)
+        self.getchannelMembers(channelID)
 
     @log
     def getChannels_list(self):
@@ -73,14 +85,7 @@ class CPrePareInfo:
         for a in responsePrivate['channels']:
             self.global_channels_List[a['id']] = a['name']
             self.getchannels_info(a['id'])
-
-        response = self.slack_web_client.channels_list()
-        #print(response)
-        for a in response['channels']:
-            self.global_channels_List[a['id']] = a['name']
-            self.getchannels_info(a['id'])
-        #return
-        
+      
         
 
     @log
@@ -112,7 +117,7 @@ class CPrePareInfo:
 if __name__ == "__main__":
     slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
     prepareInfo =CPrePareInfo(slack_web_client,None)
-    prepareInfo.autoloadaaa()
+    #prepareInfo.autoloadaaa()
     try:
         prepareInfo.getchannels_info('CUV4HHNSH')
     except  Exception as inst:
