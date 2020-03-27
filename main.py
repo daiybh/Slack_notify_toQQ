@@ -20,7 +20,7 @@ logger .setLevel(logging.INFO)
 rf_handler = logging.handlers.TimedRotatingFileHandler(filename="all.log",when='D',interval=1)
 rf_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] - %(message)s"))
 
-#在控制台打印日志
+
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
