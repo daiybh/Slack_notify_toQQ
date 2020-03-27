@@ -217,8 +217,9 @@ def makeMsg(event_data):
     try:
       if event_data['event']['channel'] not in prepareInfo.global_channels_List:
         prepareInfo.getchannels_info(event_data['event']['channel'])
-      return  '#'+ prepareInfo.global_channels_List[event_data['event']['channel']]+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
-    except:
+      return  '#'+ prepareInfo.global_channels_List[event_data['event']['channel']].name+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+    except   Exception as inst:
+      print(inst)
       return text
 
 def transferMessage(event_data):  
