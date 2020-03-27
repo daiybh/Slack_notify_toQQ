@@ -13,13 +13,21 @@ def log(func):
         return run_func
     return wrapper
 
+class Channel:
+    def __init__(self,channelID,name=None):
+        self.name =None
+        self.ChannelID=channelID
+        self.Members=[]
+        self.Private =False
+    
+
 class CPrePareInfo:
     def __init__(self,slack_web_client,QQBot):
          self.slack_web_client = slack_web_client
          self.QQBot = QQBot
          
          self.global_userList={}
-         self.global_channels_List={}
+         self.global_channels_List={} #{'channelID':{'name':'truename','member':[],'private':'True'}}
          self.global_QQ_UserID={}
          self.global_QQID_displayName={}
          self.__needAlert_userList={}#{'needAlertChannelID':{'member':['wang','x','b']},'needAlertChannelID':{'member':['wang','x','b']}}
@@ -48,7 +56,7 @@ class CPrePareInfo:
     
     def getchannelID_byName(self,name):
         for a in self.global_channels_List:
-            if self.global_channels_List[a] == name:
+            if self.global_channels_List[a].name == name:
                 return a
         return ''
 
@@ -57,8 +65,10 @@ class CPrePareInfo:
         a= self.slack_web_client.conversations_info(channel=channelID)
         if a['ok']==False:
             return
-        print(a)
-        self.global_channels_List[a['channel']['id']] = a['channel']['name']
+        if channelID not in self.global_channels_List:            
+            self.global_channels_List[a['channel']['id']] =Channel(channelID)
+        self.global_channels_List[a['channel']['id']].name = a['channel']['name']    
+        self.global_channels_List[channelID].Private = a['channel']['is_private']    
         
     @log
     def getchannelMembers(self,channelID):
@@ -68,6 +78,7 @@ class CPrePareInfo:
         print(a)
         needlist=[]
         for userId in a['members']:
+            self.global_channels_List[channelID].Members.append(userId)
             if 'QQ' in self.global_userList[userId]:
                 needlist.append(self.global_userList[userId]['QQ'])            
         if len(needlist)>0:
@@ -83,7 +94,7 @@ class CPrePareInfo:
         responsePrivate=self.slack_web_client.conversations_list(types='public_channel,private_channel')
         print(responsePrivate)
         for a in responsePrivate['channels']:
-            self.global_channels_List[a['id']] = a['name']
+            self.global_channels_List[a['id']] =Channel(a['id'], a['name'])
             self.getchannels_info(a['id'])
       
         
