@@ -80,7 +80,9 @@ def handle_msg(event):
     print("bot.on_message  handlemsg-->",event['message'] ,event['user_id'],channel)
     return '' #{'reply': event['message'], 'at_sender': False}
 
-
+@app.route('/b')
+def bbb():
+  return "hello"+str(datetime.datetime.now())
 @app.route('/')
 def aaaa():
   ip = requests.get('http://myip.ipip.net/')

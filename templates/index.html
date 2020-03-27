@@ -29,7 +29,21 @@
     <ul>
       <h1>global_channels_List</h1>
       {% for c in global_channels_List -%}
-      <li>ID: {{ c}} ------- {{global_channels_List[c]}}</li>
+      <li>ID: {{ c}} ------- {{global_channels_List[c].name}}</li>
+      <ul>
+        {% for user in global_channels_List[c].Members %}
+        <li> {{global_QQ_UserID[user]}}  </li>
+        {% endfor %}
+      </ul>
+      {%- endfor %}
+    </ul>
+
+  </div>
+  <div style="display:inline-block;background:#0f0;margin-left:50px;vertical-align: top;">
+    <ul>
+      <h1>global_channels_List</h1>
+      {% for c in global_channels_List -%}
+      <li>ID: {{ c}} ------- {{global_channels_List[c].name}}</li>
       {% if needAlert_userList[c] %}
       <ul>
         {% for qq in needAlert_userList[c] %}
