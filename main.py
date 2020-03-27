@@ -224,7 +224,11 @@ def makeMsg(event_data):
 def transferMessage(event_data):  
     message=makeMsg(event_data)
     print(message,event_data['event']['channel'])
-    return
+    try:
+      if config.TransToQQ==False:
+        return
+    except:
+      pass
     if event_data['event']['channel'] not in prepareInfo.needAlert_userList:
         bot.send_group_msg(group_id=config.group_id, message=message)
         return
