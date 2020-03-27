@@ -32,7 +32,7 @@
       <li>ID: {{ c}} ------- {{global_channels_List[c].name}}</li>
       <ul>
         {% for user in global_channels_List[c].Members %}
-        <li> {{global_QQ_UserID[user]}}  </li>
+        <li>{{user}}--- {{global_QQ_UserID[user]}}  </li>
         {% endfor %}
       </ul>
       {%- endfor %}
