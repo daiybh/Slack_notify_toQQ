@@ -44,7 +44,7 @@ class CPrePareInfo:
     @log
     def getUserList(self):        
         response = self.slack_web_client.users_list()
-        print(response)
+        #print(response)
         if response['ok'] :
             for a in response['members']:
             #print(a['id'],a['name'])      
@@ -75,7 +75,7 @@ class CPrePareInfo:
         a = self.slack_web_client.conversations_members(channel=channelID)
         if a['ok'] ==False:
             return
-        print(a)
+        #print(a)
         needlist=[]
         for userId in a['members']:
             self.global_channels_List[channelID].Members.append(userId)
@@ -92,7 +92,7 @@ class CPrePareInfo:
     @log
     def getChannels_list(self):
         responsePrivate=self.slack_web_client.conversations_list(types='public_channel,private_channel')
-        print(responsePrivate)
+        #print(responsePrivate)
         for a in responsePrivate['channels']:
             self.global_channels_List[a['id']] =Channel(a['id'], a['name'])
             self.getchannels_info(a['id'])
@@ -102,6 +102,7 @@ class CPrePareInfo:
     @log
     def get_group_member_list(self):    
         a = self.QQBot.get_group_member_list(group_id=config.group_id)
+        print("get_group_member_list ",a)
         for b in a:
             self.global_QQ_UserID[b['card']] =b['user_id']
     
