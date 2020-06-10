@@ -235,7 +235,11 @@ def transferMessage(event_data):
         return
     
     for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:        
-        bot.send_private_msg(user_id=a, message=message)
+        try:
+          bot.send_private_msg(user_id=a, message=message)
+        except:
+          pass
+
         lastRecvedChannels[a] = event_data['event']['channel']
 
 
