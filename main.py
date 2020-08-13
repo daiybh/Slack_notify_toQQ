@@ -14,6 +14,7 @@ from  prepareInfo import CPrePareInfo
 import asyncio
 import logging
 import logging.handlers
+import MessageTail
 
 logger = logging.getLogger("slackQQ")
 logger .setLevel(logging.INFO)
@@ -235,8 +236,8 @@ def transferMessage(event_data):
         return
     
     for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:        
-        try:
-          bot.send_private_msg(user_id=a, message=message)
+        try:          
+          bot.send_private_msg(user_id=a, message=MessageTail.addTail(a,message))
         except:
           pass
 
