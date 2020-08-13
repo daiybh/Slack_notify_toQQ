@@ -44,13 +44,19 @@ tailist={}
 
 def addTail(userid,message):
     
-    if userid not in taierlist:
-      taierlist[userid]=Tailer()
+    if userid not in tailist:
+      tailist[userid]=Tailer()
 
-    if taierlist[userid].addTailer():
+    if tailist[userid].addTailer():
         message=message+tmsg.getMsg()
     
     return message
 
+
+
+if __name__ == "__main__":
+    for i in range(12):
+        print(addTail("a","aaaaaa"+str(i)))
+    print(addTail("a","aaaaaa"))
 
 
