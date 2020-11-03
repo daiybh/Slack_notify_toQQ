@@ -259,7 +259,7 @@ def handle_message(event_data):
 def route_pp():
      return str(bot.send_private_msg(user_id=7277017, message='message'))       
 
-@app.route('/option')
+@app.route('/op')
 def route_pp():
   global bSendGroup
   group = request.args.get("group")
