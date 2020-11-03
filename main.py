@@ -260,7 +260,7 @@ def route_pp():
      return str(bot.send_private_msg(user_id=7277017, message='message'))       
 
 @app.route('/op')
-def route_pp():
+def route_op():
   global bSendGroup
   group = request.args.get("group")
   if group=='on':
