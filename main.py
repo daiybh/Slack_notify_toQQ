@@ -52,6 +52,7 @@ prepareInfo.getUserList()
 
 lastEventTS=0.0
 lock=threading.Lock()
+bSendGroup=False
 
 @bot.on_message
 def handle_msg(event):
@@ -231,9 +232,9 @@ def transferMessage(event_data):
         return
     except:
       pass
-    if event_data['event']['channel'] not in prepareInfo.needAlert_userList:
+    if bSendGroup or event_data['event']['channel'] not in prepareInfo.needAlert_userList:
         bot.send_group_msg(group_id=config.group_id, message=message)
-        return
+        
     
     for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:        
         try:          
@@ -257,6 +258,17 @@ def handle_message(event_data):
 @app.route('/pp')
 def route_pp():
      return str(bot.send_private_msg(user_id=7277017, message='message'))       
+
+@app.route('/option')
+def route_pp():
+  global bSendGroup
+  group = request.args.get("group")
+  if group=='on':
+    bSendGroup=True
+
+  print('group',group)
+  return str(bot.send_group_msg(group_id=config.group_id, message='message'))       
+
 
 import time   
 # Start the server on port 3000
