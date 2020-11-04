@@ -52,7 +52,7 @@ prepareInfo.getUserList()
 
 lastEventTS=0.0
 lock=threading.Lock()
-bSendGroup=False
+bSendGroup=True
 
 @bot.on_message
 def handle_msg(event):
