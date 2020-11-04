@@ -255,19 +255,23 @@ def handle_message(event_data):
         transferMessage(event_data)
           
 
-@app.route('/pp')
-def route_pp():
-     return str(bot.send_private_msg(user_id=7277017, message='message'))       
+@app.route('/pm/<userid>')
+@app.route('/pm')
+def route_pp(userid=7277017):
+     return str(bot.send_private_msg(user_id=userid, message='message'))       
 
-@app.route('/op')
-def route_op():
+@app.route('/group/<status>')  
+@app.route('/group')
+def group_op(status=''):
+  if status=='':
+    return "group/on[off]"
+
   global bSendGroup
-  group = request.args.get("group")
-  if group=='on':
-    bSendGroup=True
 
-  print('group',group)
-  return str(bot.send_group_msg(group_id=config.group_id, message='message'))       
+  if status=='on':
+    bSendGroup=True
+  print('group',status)
+  return str(bot.send_group_msg(group_id=config.group_id, message='sendGroup meesage '+('on' if status=='on' else 'off') ))       
 
 
 import time   
