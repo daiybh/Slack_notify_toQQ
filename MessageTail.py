@@ -17,9 +17,9 @@ class TailMsg:
     def getMsg(self):
         
         self.leftDay = self.destDay.__sub__(datetime.datetime.now())
-        
-        msg="\n left--->{}".format(self.leftDay)
-        return msg
+        if self.leftDay.days >=0: 
+            return "\n left--->{}".format(self.leftDay)
+        return ""
 
 class Tailer:
     def __init__(self):
