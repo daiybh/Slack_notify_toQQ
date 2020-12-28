@@ -132,8 +132,6 @@ def verify_slack_token(request_token):
         print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
         return make_response("Request contains invalid Slack verification token", 403)
 
-
-
 # The endpoint Slack will load your menu options from
 @app.route("/slack/message_options", methods=["POST"])
 def message_options():
