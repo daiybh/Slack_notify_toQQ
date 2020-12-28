@@ -219,6 +219,7 @@ def append_image(event_data):
   if 'files' in event_data['event']:
     for bb in event_data['event']['files']:    
         zzzImage+="[CQ:image,file={}]".format(bb['url_private'])    
+    logger.info("append_image---->{0}".format(zzzImage))
   return zzzImage
 
 
