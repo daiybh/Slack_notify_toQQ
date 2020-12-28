@@ -214,12 +214,26 @@ def replaceUser(text):
     if Msg=='':
       return text
     return Msg
+
+
+def append_image(event_data):
+  zzzImage='\n'
+  if 'files' in event_data['event']:
+    for bb in event_data['event']['files']:    
+        zzzImage+="[CQ:image,file={}]".format(bb['url_private'])    
+  return zzzImage
+
+
 def makeMsg(event_data):
     text = event_data['event']['text']
+    msgFileList= append_image(event_data)
+
     try:
       if event_data['event']['channel'] not in prepareInfo.global_channels_List:
         prepareInfo.getchannels_info(event_data['event']['channel'])
-      return  '#'+ prepareInfo.global_channels_List[event_data['event']['channel']].name+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+      totalMsg = '#'+ prepareInfo.global_channels_List[event_data['event']['channel']].name+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+      totalMsg+= msgFileList
+      return totalMsg
     except   Exception as inst:
       print(inst)
       return text
