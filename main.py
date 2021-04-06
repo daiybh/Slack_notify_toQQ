@@ -245,8 +245,9 @@ def transferMessage(event_data):
         return
     except:
       pass
-    if bSendGroup or event_data['event']['channel'] not in prepareInfo.needAlert_userList:
-        bot.send_group_msg(group_id=config.group_id, message=message)
+    #avoid QQ close our QQNumber.
+    #if bSendGroup or event_data['event']['channel'] not in prepareInfo.needAlert_userList:
+    #    bot.send_group_msg(group_id=config.group_id, message=message)
         
     
     for a in prepareInfo.needAlert_userList[event_data['event']['channel']]:        

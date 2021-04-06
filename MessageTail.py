@@ -43,7 +43,7 @@ tmsg = TailMsg()
 tailist={}
 
 def addTail(userid,message):
-    
+    return message
     if userid not in tailist:
       tailist[userid]=Tailer()
 
