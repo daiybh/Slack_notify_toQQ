@@ -90,6 +90,21 @@ class CPrePareInfo:
         self.getchannelMembers(channelID)
 
     @log
+    def getMemberName(self,userID):
+        if userID  in prepareInfo.global_userList:
+            return self.global_userList[userID]['name']
+
+        responseInfo = slack_web_client.users_info(user='U024UBGRR62')
+        if responseInfo.get('ok',False):
+            d = responseInfo.data['user']
+            print(d['real_name'])
+            self.global_userList[userID] = self.getQQID(d['real_name'],d['name']) 
+            return d['real_name']
+        return 'NoName'
+
+
+
+    @log
     def getChannels_list(self):
         responsePrivate=self.slack_web_client.conversations_list(types='public_channel,private_channel')
         #print(responsePrivate)

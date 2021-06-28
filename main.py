@@ -230,7 +230,8 @@ def makeMsg(event_data):
     try:
       if event_data['event']['channel'] not in prepareInfo.global_channels_List:
         prepareInfo.getchannels_info(event_data['event']['channel'])
-      totalMsg = '#'+ prepareInfo.global_channels_List[event_data['event']['channel']].name+' '+ prepareInfo.global_userList[event_data['event']['user']]['name']+" say: "+replaceUser(text)
+      
+      totalMsg = '#'+ prepareInfo.global_channels_List[event_data['event']['channel']].name+' '+ prepareInfo.getMemberName(event_data['event']['user'])+" say: "+replaceUser(text)
       totalMsg+= msgFileList
       return totalMsg
     except   Exception as inst:
