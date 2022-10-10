@@ -96,11 +96,6 @@ def aaaa():
 def index(name=''):    
     #prepareInfo.autoload()   
     ip = requests.get('http://myip.ipip.net/')
-    
-    #print(prepareInfo.global_userList)
-    #print(prepareInfo.global_channels_List)
-    #print(prepareInfo.global_QQ_UserID)
-    #print(prepareInfo.needAlert_userList)
     if name!='' and name not in prepareInfo.needAlert_userList:
       print("name not in",name)
       prepareInfo.getchannels_info(name)

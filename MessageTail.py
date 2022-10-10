@@ -1,9 +1,3 @@
-
-
-
-
-
-
 import datetime
 import time
 
@@ -18,7 +12,7 @@ class TailMsg:
         
         self.leftDay = self.destDay.__sub__(datetime.datetime.now())
         if self.leftDay.days >=0: 
-            return "\n left--->{}".format(self.leftDay)
+            return "\n left--->{} happy birthday".format(self.leftDay)
         return ""
 
 class Tailer:
